@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArenaController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BadIceCream</a> &gt; <a href="index.source.html" class="el_package">badIceCream.controller.game</a> &gt; <span class="el_source">ArenaController.java</span></div><h1>ArenaController.java</h1><pre class="source lang-java linenums">package badIceCream.controller.game;
+
+import badIceCream.GUI.GUI;
+import badIceCream.Game;
+import badIceCream.controller.game.monsters.DefaultMovement;
+import badIceCream.controller.game.monsters.JumperMovement;
+import badIceCream.controller.game.monsters.RunnerMovementDisabled;
+import badIceCream.controller.game.monsters.WallBreakerMovement;
+import badIceCream.model.game.arena.Arena;
+import badIceCream.model.game.elements.monsters.Monster;
+import badIceCream.model.menu.GameOverMenu;
+import badIceCream.model.menu.LevelCompletedMenu;
+import badIceCream.model.menu.PauseMenu;
+import badIceCream.states.GameOverMenuState;
+import badIceCream.states.GameState;
+import badIceCream.states.LevelCompletedMenuState;
+import badIceCream.states.PauseMenuState;
+import badIceCream.utils.Type;
+
+import java.io.IOException;
+import java.util.List;
+
+public class ArenaController extends GameController {
+    private final IceCreamController iceCreamController;
+    private final List&lt;MonsterController&gt; monsterController;
+    private boolean first;
+    private long strawberry;
+
+    public ArenaController(Arena arena, IceCreamController iceCreamController, List&lt;MonsterController&gt; monsterController) {
+<span class="fc" id="L30">        super(arena);</span>
+<span class="fc" id="L31">        this.iceCreamController = iceCreamController;</span>
+<span class="fc" id="L32">        this.monsterController = monsterController;</span>
+<span class="fc" id="L33">        this.first = true;</span>
+
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        for (Monster m : arena.getMonsters()) {</span>
+<span class="fc bfc" id="L36" title="All 5 branches covered.">            switch (m.getType()) {</span>
+<span class="fc" id="L37">                case 1: monsterController.add(new MonsterController(arena, new DefaultMovement(), m));</span>
+<span class="fc" id="L38">                    break;</span>
+<span class="fc" id="L39">                case 2: monsterController.add(new MonsterController(arena, new JumperMovement(), m));</span>
+<span class="fc" id="L40">                    break;</span>
+                case 3:
+<span class="fc" id="L42">                    monsterController.add(new MonsterController(arena,new RunnerMovementDisabled(), m));</span>
+<span class="fc" id="L43">                    break;</span>
+<span class="fc" id="L44">                case 4: monsterController.add(new MonsterController(arena, new WallBreakerMovement(), m));</span>
+                    break;
+            }
+<span class="fc" id="L47">        }</span>
+<span class="fc" id="L48">    }</span>
+
+    @Override
+    public void step(Game game, GUI.ACTION action, long time) throws IOException {
+<span class="fc" id="L52">        int fruit = iceCreamController.eatFruit();</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (fruit != -1) {</span>
+
+<span class="fc bfc" id="L55" title="All 2 branches covered.">            if (fruit == 5) {</span>
+<span class="fc" id="L56">                getModel().getIceCream().setStrawberry(true);</span>
+<span class="fc" id="L57">                strawberry = time;</span>
+            }
+
+        }
+
+<span class="fc bfc" id="L62" title="All 4 branches covered.">        if (getModel().getIceCream().isStrawberryActive() &amp;&amp; time - strawberry &gt;= 10000) {</span>
+<span class="fc" id="L63">            getModel().getIceCream().setStrawberry(false);</span>
+        }
+
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (getModel().getFruits().isEmpty()) {</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">            if (first) {</span>
+<span class="fc" id="L68">                first = false;</span>
+<span class="fc" id="L69">                getModel().generateNewFruits(getModel().getLevel());</span>
+            }
+            else {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">                if (getModel().getLevel() &gt;= game.getState().getLevel()) {</span>
+<span class="fc" id="L73">                    game.getState().increaseLevel();</span>
+                }
+<span class="fc" id="L75">                game.setState(new LevelCompletedMenuState(new LevelCompletedMenu(), game.getState().getLevel()), Type.win,140,50);</span>
+            }
+        }
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        else if (!getModel().getIceCream().getAlive()) {</span>
+<span class="fc" id="L79">            game.setState(new GameOverMenuState(new GameOverMenu(), game.getState().getLevel()), Type.gameOver, 140, 50);</span>
+        }
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        else if (action == GUI.ACTION.PAUSE) {</span>
+<span class="fc" id="L82">            game.setState(new PauseMenuState(new PauseMenu(), (GameState) game.getState(), game.getState().getLevel()), Type.menu, 140, 50);</span>
+        }
+        else {
+<span class="fc" id="L85">            iceCreamController.step(game, action, time);</span>
+        }
+<span class="fc" id="L87">    }</span>
+    @Override
+    public void stepMonsters(long time) throws IOException {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        for (MonsterController m : monsterController) {</span>
+<span class="fc" id="L91">            m.step(time);</span>
+<span class="fc" id="L92">        }</span>
+<span class="fc" id="L93">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

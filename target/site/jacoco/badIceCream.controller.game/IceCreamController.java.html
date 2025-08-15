@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IceCreamController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BadIceCream</a> &gt; <a href="index.source.html" class="el_package">badIceCream.controller.game</a> &gt; <span class="el_source">IceCreamController.java</span></div><h1>IceCreamController.java</h1><pre class="source lang-java linenums">package badIceCream.controller.game;
+
+import badIceCream.GUI.GUI;
+import badIceCream.Game;
+import badIceCream.model.Position;
+import badIceCream.model.game.arena.Arena;
+import badIceCream.model.game.elements.IceCream;
+
+
+public class IceCreamController extends GameController {
+
+        private final IceCream iceCream;
+<span class="fc" id="L13">        private GUI.ACTION lastMovement = GUI.ACTION.DOWN;</span>
+<span class="fc" id="L14">        long lastTime = 0;</span>
+        public IceCreamController(Arena arena) {
+<span class="fc" id="L16">            super(arena);</span>
+<span class="fc" id="L17">            this.iceCream = arena.getIceCream();</span>
+<span class="fc" id="L18">        }</span>
+
+        private void moveIceCreamLeft() {
+<span class="fc" id="L21">            moveIceCream(getModel().getIceCream().getPosition().getLeft(), GUI.ACTION.LEFT, System.currentTimeMillis());</span>
+<span class="fc" id="L22">        }</span>
+
+        private void moveIceCreamRight() {
+<span class="fc" id="L25">            moveIceCream(getModel().getIceCream().getPosition().getRight(), GUI.ACTION.RIGHT, System.currentTimeMillis());</span>
+<span class="fc" id="L26">        }</span>
+
+        private void moveIceCreamUp() {
+<span class="fc" id="L29">            moveIceCream(getModel().getIceCream().getPosition().getUp(), GUI.ACTION.UP, System.currentTimeMillis());</span>
+<span class="fc" id="L30">        }</span>
+
+        private void moveIceCreamDown() {
+<span class="fc" id="L33">            moveIceCream(getModel().getIceCream().getPosition().getDown(), GUI.ACTION.DOWN, System.currentTimeMillis());</span>
+<span class="fc" id="L34">        }</span>
+
+        public int eatFruit() {
+<span class="fc" id="L37">            return getModel().eatFruit(getModel().getIceCream().getPosition());</span>
+        }
+
+        private void moveIceCream(Position position, GUI.ACTION last, long time) {
+<span class="pc bpc" id="L41" title="1 of 4 branches missed."></span>
+<span class="fc" id="L42">            if (getModel().isEmpty(position) &amp;&amp; time - lastTime &gt;= 15) {</span>
+                iceCream.setPosition(position);
+<span class="pc bpc" id="L44" title="1 of 4 branches missed."></span>
+                if (!iceCream.isStrawberryActive() &amp;&amp; getModel().hasMonster(position) != null) iceCream.changeAlive();
+<span class="fc" id="L46">            }</span>
+<span class="fc" id="L47">            iceCream.setLastMovement(last);</span>
+<span class="fc" id="L48">            lastMovement = last;</span>
+        }
+
+<span class="fc" id="L51">        public void powerIceCream() {</span>
+<span class="fc" id="L52">            getModel().powerIceCream(lastMovement);</span>
+        }
+
+        @Override
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        public void step(Game game, GUI.ACTION action, long time) {</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">            if (action == GUI.ACTION.UP) moveIceCreamUp();</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">            if (action == GUI.ACTION.RIGHT) moveIceCreamRight();</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            if (action == GUI.ACTION.DOWN) moveIceCreamDown();</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">            if (action == GUI.ACTION.LEFT) moveIceCreamLeft();</span>
+<span class="fc" id="L61">            if (action == GUI.ACTION.SPACE) powerIceCream();</span>
+        }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
